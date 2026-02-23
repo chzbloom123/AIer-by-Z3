@@ -1,21 +1,26 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { PrismaClient } from "@prisma/client";
 
 const router = Router();
+const prisma = new PrismaClient();
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@example.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "changeme";
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+  const admin = await prisma.admin.findUnique({ where: { email } });
+
+  if (!admin || !bcrypt.compareSync(password, admin.password)) {
     res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
-  const token = jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "24h" });
+  const token = jwt.sign({ role: "admin", id: admin.id }, JWT_SECRET, {
+    expiresIn: "24h",
+  });
   res.json({ token });
 });
 

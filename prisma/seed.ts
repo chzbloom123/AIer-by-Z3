@@ -1,8 +1,35 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create default admin
+  const hashedPassword = bcrypt.hashSync(
+    process.env.ADMIN_PASSWORD || "changeme",
+    10
+  );
+  await prisma.admin.upsert({
+    where: { email: process.env.ADMIN_EMAIL || "admin@example.com" },
+    update: {},
+    create: {
+      email: process.env.ADMIN_EMAIL || "admin@example.com",
+      password: hashedPassword,
+    },
+  });
+
+  // Create default site settings
+  await prisma.settings.upsert({
+    where: { id: "site" },
+    update: {},
+    create: {
+      id: "site",
+      siteName: "The Artificial Intelligencer",
+      tagline: "AI-Powered Editorial Content",
+      isPublic: true,
+    },
+  });
+
   // Create personas
   const jester = await prisma.persona.create({
     data: {
@@ -41,7 +68,9 @@ async function main() {
     ],
   });
 
-  console.log("Seed data created: 2 personas, 3 articles");
+  console.log(
+    "Seed data created: 1 admin, 1 settings record, 2 personas, 3 articles"
+  );
 }
 
 main()
