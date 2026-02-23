@@ -9,7 +9,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="border-b border-editorial-200 bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="max-w-3xl mx-auto px-4 py-6" flex items-center justify-between>
           <Link to="/">
             <h1 className="font-headline text-3xl font-black tracking-tight text-editorial-950">
               The Artificial Intelligencer
@@ -19,6 +19,7 @@ export default function App() {
             All the news that's fit to fabricate
           </p>
         </div>
+                <Link to="/admin/login" className="text-xs text-editorial-400 hover:text-editorial-600 font-body">Admin</Link>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
